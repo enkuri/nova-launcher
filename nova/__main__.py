@@ -1,9 +1,8 @@
-import os
-import nova
 from nova.config import Config
-from nova.modules.api import API
-from nova.modules import mc
+from nova.ge import manager as mgr
 import logging
+import pygame as pg
+from screeninfo import get_monitors
 
 
 # -- logging --
@@ -20,41 +19,54 @@ root.addHandler(terminal)
 Config.init()
 Config.load()
 
-mc.check_for_installation('1')
+# -- settings up pygame --
 
-# -- authorization --
-if Config.cfg['login'] == '' or Config.cfg['password'] == '':
-    root.info('No authorization data. Please provide your credentials')
-    login, pwd = input('Login> '), input('Password> ')
-    Config.cfg['login'] = login
-    Config.cfg['password'] = pwd
-    Config.dump()
+# primary monitor's size
+size: tuple[int, int] = None
+for monitor in get_monitors():
+    if not monitor.is_primary:
+        continue
+    size = (monitor.width, monitor.height)
+
+max_size = (1280, 720)
+
+# determining proper window size
+if size[0] > max_size[0] and size[1] > max_size[1]:
+    width, height = max_size
+elif size[0] < max_size[0]:
+    width_ratio = size[0] / max_size[0]
+    height = int(size[1] * 0.8)
+    width = int(max_size[0] * width_ratio)
+    if width > size[0]:
+        width = size[0]
+        height = int(width / max_size[0] * max_size[1])
 else:
-    login, pwd = Config.cfg['login'], Config.cfg['password']
-    if pwd is None:
-        pwd = input('Password> ')
-        Config.cfg['pasword'] = pwd
-        Config.dump()
+    width = size[0]
+    height_ratio = size[1] / max_size[1]
+    height = int(max_size[1] * height_ratio)
 
-root.info('Checking authorization')
-if API.check_auth(login, pwd):
-    root.info('Credentials are valid')
-else:
-    root.error('Wrong credentials')
-    Config.cfg['password'] = None
-    exit()
+# initializing display
+pg.display.init()
+screen = pg.display.set_mode((width, height))
 
-# -- check version --
-game_info = API.get_game_info()
 
-forge_version = mc.find_forge_version(game_info['version'])
-if not mc.check_for_installation(forge_version):
-    root.warning('Can\'t find forge game instance')
-    mc.install_forge(forge_version)
+def run():
+    pg.init()
+    mgr.init(screen)
 
-root.info('Starting game')
+    fps = 30
+    fps_clock = pg.time.Clock()
 
-mc.launch_game(
-    Config.cfg['login'],
-    forge_version
-)
+    pg.display.set_caption('Nova launcher - ekr!dev')
+
+    dt = 1 / fps
+    while True:
+        mgr.draw(dt)
+        mgr.update(dt)
+
+        pg.display.flip()
+        dt = fps_clock.tick(fps)
+
+
+if __name__ == '__main__':
+    run()
