@@ -39,4 +39,5 @@ def launch_game(username, version_id):
     }
 
     mc_cmd = mll.command.get_minecraft_command(version_id, Config.paths['dir'], options=options)
+    mll.types.MinecraftOptions
     subprocess.call(mc_cmd)

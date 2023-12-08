@@ -50,7 +50,7 @@ def switch_scene(target_scene: str, init=True, transition=None, *args, **kwargs)
     current_scene_name = target_scene
     current_scene = scene
 
-    log.info('successfully switched to scene {}'.format(scene))
+    log.info('successfully switched to scene {}'.format(target_scene))
 
 
 def init(screen_: pg.Surface):

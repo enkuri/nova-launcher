@@ -7,4 +7,4 @@ def update(*_):
 
 
 def draw(screen, dt):
-    screen.fill('red')
+    screen.fill('blue')

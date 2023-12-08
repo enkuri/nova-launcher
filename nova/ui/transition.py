@@ -13,27 +13,25 @@ def init(p_scene, n_scene, args_, kwargs_) -> None:
     
     size = manager.screen.get_size()
     ani = easing.Combo([
-        easing.Animation('CircularEaseOut', -size[1], 0, 1200),
+        easing.Animation('CubicEaseOut', -size[1], 0, 1200),
         easing.Pause(0, 600),
-        easing.Animation('CircularEaseOut', 0, size[1], 1200)
+        easing.Animation('CubicEaseOut', 0, size[1], 1200)
     ])
 
     frame = pg.Surface(size)
-    font = pg.font.Font('./nova/assets/mplus_medium.ttf', 30)
+    font = pg.font.Font('./nova/assets/mplus_medium.ttf', round(size[1] * 0.2))
     top_text = font.render('NoVa', True, (255, 255, 255))
 
-    font = pg.font.Font('./nova/assets/mplus_medium.ttf', 16)
+    font = pg.font.Font('./nova/assets/mplus_medium.ttf', round(size[1] * 0.02))
     bottom_text = font.render('www.ekr.moe', True, (255, 255, 255))
 
-    space = size[1] * 0.05 // 2
-
     frame.blit(top_text, (
-        size[0] // 2 - top_text.get_width() // 2,
-        size[1] // 2 - space - bottom_text.get_height() // 2
+        (size[0] - top_text.get_width()) // 2,
+        (size[1] - top_text.get_height()) // 2
     ))
     frame.blit(bottom_text, (
         size[0] // 2 - bottom_text.get_width() // 2,
-        size[1] // 2 + space + top_text.get_height() // 2
+        size[1] - bottom_text.get_height()
     ))
 
 
